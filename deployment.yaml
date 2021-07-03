@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: podsweeper
+  namespace: processing
+  labels:
+    app: dea-podsweeper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dea-podsweeper
+  template:
+    metadata:
+      labels:
+        app: dea-podsweeper
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: podsweeper
+        image: uchchwhash/podsweeper:latest
+        imagePullPolicy: Always
+        command: ['python', '-m', 'podsweeper', '--namespace', 'processing']
