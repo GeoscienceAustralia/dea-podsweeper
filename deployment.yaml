@@ -25,7 +25,7 @@ spec:
       serviceAccountName: pods-list
       containers:
       - name: podsweeper
-        image: mmochan/podsweeper:latest
+        image: uchchwhash/podsweeper:latest
         imagePullPolicy: Always
         command: ['python', '-m', 'podsweeper', '--namespace', 'processing']
 

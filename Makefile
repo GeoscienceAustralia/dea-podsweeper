@@ -1,8 +1,8 @@
 build:
-	docker build -t mmochan/podsweeper:latest .
+	docker build -t uchchwhash/podsweeper:latest .
 
 push:
-	docker push mmochan/podsweeper:latest
+	docker push uchchwhash/podsweeper:latest
 
 apply:
 	kubectl apply -f deployment.yaml
