@@ -1,3 +1,10 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+ name: pods-list
+ namespace: processing
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,9 +22,35 @@ spec:
       labels:
         app: dea-podsweeper
     spec:
-      serviceAccountName: default
+      serviceAccountName: pods-list
       containers:
       - name: podsweeper
-        image: uchchwhash/podsweeper:latest
+        image: mmochan/podsweeper:latest
         imagePullPolicy: Always
         command: ['python', '-m', 'podsweeper', '--namespace', 'processing']
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: processing
+  name: pods-list
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pods-list
+  namespace: processing
+roleRef:
+  kind: Role
+  name: pods-list
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+- kind: ServiceAccount
+  name: pods-list
+  namespace: processing
