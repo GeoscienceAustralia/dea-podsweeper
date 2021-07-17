@@ -27,7 +27,7 @@ spec:
       - name: podsweeper
         image: uchchwhash/podsweeper:latest
         imagePullPolicy: Always
-        command: ['python', '-m', 'podsweeper',
+        command: ['python', '-m', 'podsweeper', '--dry-run',
                   '--namespace', 'processing', '--expire-in-hours', '24', '--field-selector', 'status.phase=Pending']
 
 ---

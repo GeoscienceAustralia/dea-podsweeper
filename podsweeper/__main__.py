@@ -1,7 +1,11 @@
 from datetime import datetime, timezone
+import logging
 
 import click
 from kubernetes import client, config
+
+
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 
 @click.command()
 @click.option('--namespace', required=True, type=str)
@@ -9,7 +13,8 @@ from kubernetes import client, config
 @click.option('--label-selector', type=str)
 @click.option('--pod-name-prefix', type=str, help='only select pods whose name starts with this prefix')
 @click.option('--expire-in-hours', type=int, help='only select pods that are aged more than this many hours')
-def main(namespace, field_selector, label_selector, pod_name_prefix, expire_in_hours):
+@click.option('--dry-run', is_flag=True, default=False)
+def main(namespace, field_selector, label_selector, pod_name_prefix, expire_in_hours, dry_run):
     config.load_incluster_config()
 
     kwargs = {'field_selector': field_selector, 'label_selector': label_selector}
@@ -62,6 +67,18 @@ def main(namespace, field_selector, label_selector, pod_name_prefix, expire_in_h
 
     for pod in pods.items:
         if predicate(pod):
-            print(show(pod))
+            pod_desc = show(pod)
+
+            if dry_run:
+                logging.info('pod to be deleted: %s', pod_desc)
+
+            else:
+                try:
+                    logging.info('deleting pod: %s', pod_desc)
+                    v1.delete_namespaced_pod(namespace=namespace, name=pod.metadata.name)
+                    logging.info('pod deleted: %s', pod_desc)
+                except Exception as e:
+                    logging.error('could not delete pod %s because %s', pod_desc, e)
+
 
 main()
